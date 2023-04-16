@@ -1,6 +1,7 @@
 import csv
 from selenium import webdriver
 import time
+import re
 from selenium.common.exceptions import NoSuchElementException
 
 words = []
@@ -8,12 +9,17 @@ exitProgram = False
 
 
 def formatSetence(word):
-    word = word.strip()
-    word = word.split()
-    finalText = " ".join(word)
-    finalText = finalText.replace(" ", "%20")
+   specialCharacters = re.findall(r'[^\w\s]', word)
+   
+   if len(specialCharacters) == 0:
+       return word
 
-    return finalText
+   if len(specialCharacters) > 0:
+        for character in specialCharacters:
+            word = word.replace(character + " ", character)
+   finalText = word
+
+   return finalText
 
 
 def sentenceOrWord(word):
@@ -36,20 +42,21 @@ def translate(word):
             print("word")
             # translation = driver.find_element_by_xpath(
             #     '/html/body/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[2]/div/div[8]/div/div[1]/span[1]/span/span').text
-            translation = driver.find_element("xpath","/html/body/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[2]/div/div[8]/div/div[1]/span[1]/span/span").text
+            translation = driver.find_element("xpath","/html/body/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[2]/div/div[9]/div/div[1]/span[1]/span/span").text
         else:
             print("sentence")
             # translation = driver.find_element_by_xpath(
-            #     '/html/body/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[2]/div/div[8]/div[1]/div[1]/span[1]').text
-            translation = driver.find_element("xpath","/html/body/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[2]/div/div[8]/div[1]/div[1]/span[1]").text
+            #     /html/body/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[2]/div/div[9]/div/div[1]/span[1]/span/span
+            translation = driver.find_element("xpath","/html/body/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[2]/div/div[9]/div/div[1]/span[1]/span/span").text
 
     except NoSuchElementException:
         print("word")
         # translation = driver.find_element_by_xpath(
         #     '/html/body/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[2]/div/div[8]/div[1]/div[1]/span[1]').text
-        translation = driver.find_element("xpath","/html/body/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[2]/div/div[8]/div[1]/div[1]/span[1]").text
+        translation = driver.find_element("xpath","/html/body/c-wiz/div/div[2]/c-wiz/div[2]/c-wiz/div[1]/div[2]/div[3]/c-wiz[2]/div/div[9]/div/div[1]/span[1]/span/span").text
         driver.quit()
     driver.quit()
+  
     return translation
 
 
@@ -72,6 +79,7 @@ while exitProgram == False:
         exitProgram = True
 
     else:
+        formattedWord = formatSetence(word)
         translation = translate(word)
         print(translation)
         words.append([word, translation])
